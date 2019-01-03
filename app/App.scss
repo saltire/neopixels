@@ -1,16 +1,64 @@
 .App {
+  max-width: 960px;
+  margin: auto;
+
+  h1, h2, h3 {
+    margin: .5em 0;
+    font-weight: 500;
+  }
+
+  button {
+    padding: 0 .75rem;
+    border: 0;
+    border-radius: 5px;
+    background: #333;
+    color: white;
+    font-family: inherit;
+    font-size: inherit;
+    line-height: 2rem;
+    cursor: pointer;
+  }
+
   > header {
-    margin-bottom: 2rem;
-    padding: 1em 0;
-    background: #ccc;
+    text-align: center;
+  }
+
+  > nav {
     text-align: center;
 
-    h1 {
-      margin: 0;
+    button {
+      &.active {
+        background: white;
+        color: black;
+      }
+
+      &:not(:first-child) {
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+      }
+
+      &:not(:last-child) {
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+      }
     }
   }
 
   > main {
-    text-align: center;
+    line-height: 1.5rem;
+
+    input[type=range] {
+      width: 100%;
+      vertical-align: middle;
+    }
+
+    .container-fluid {
+      margin: 1rem 0;
+    }
+
+    .color {
+      margin: .25rem 0;
+      height: 1.5rem;
+    }
   }
 }

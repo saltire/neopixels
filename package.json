@@ -1,7 +1,7 @@
 {
-  "name": "react-node-boilerplate",
+  "name": "neopixels",
   "version": "0.0.0",
-  "description": "Starting point for a single-page React app running on a Node.js server",
+  "description": "React NeoPixel controller",
   "license": "ISC",
   "engines": {
     "node": "10"
@@ -19,7 +19,9 @@
     "@babel/core": "^7.2.2",
     "@babel/preset-env": "^7.2.3",
     "@babel/preset-react": "^7.0.0",
+    "axios": "^0.18.0",
     "babel-loader": "^8.0.4",
+    "body-parser": "^1.18.3",
     "clean-webpack-plugin": "^1.0.0",
     "css-hot-loader": "^1.4.3",
     "css-loader": "^2.1.0",
@@ -32,6 +34,7 @@
     "optimize-css-assets-webpack-plugin": "^5.0.1",
     "react": "^16.7.0",
     "react-dom": "^16.7.0",
+    "react-flexbox-grid": "^2.1.2",
     "react-hot-loader": "^4.6.3",
     "sass-loader": "^7.1.0",
     "terser-webpack-plugin": "^1.2.1",

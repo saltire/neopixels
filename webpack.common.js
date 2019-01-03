@@ -45,7 +45,6 @@ module.exports = {
   plugins: [
     new HtmlPlugin({
       template: path.resolve(__dirname, 'app/index.ejs'),
-      favicon: path.resolve(__dirname, 'app/static/favicon.ico'),
     }),
   ],
 };
