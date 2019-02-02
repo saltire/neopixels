@@ -1,5 +1,5 @@
-import React, { Component } from 'react';
-import { hot } from 'react-hot-loader';
+import React, { Component, Fragment } from 'react';
+import { hot } from 'react-hot-loader/root';
 import axios from 'axios';
 
 import './App.scss';
@@ -95,7 +95,7 @@ class App extends Component {
         {mode && (
           <main>
             {mode.data.map(({ label, type, min, max }) => (
-              <>
+              <Fragment key={label}>
                 {type === 'color' && (
                   <ColorSelect
                     label={label}
@@ -112,7 +112,7 @@ class App extends Component {
                     updateValue={this.updateValue}
                   />
                 )}
-              </>
+              </Fragment>
             ))}
           </main>
         )}
@@ -125,4 +125,4 @@ class App extends Component {
   }
 }
 
-export default hot(module)(App);
+export default hot(App);
