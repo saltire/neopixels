@@ -29,12 +29,12 @@ class App extends Component {
           const values = {};
           resp.data.modes.forEach((mode) => {
             values[mode.label] = {};
-            mode.data.forEach((datum) => {
-              if (datum.type === 'color') {
-                values[mode.label][datum.id] = new Color();
+            mode.data.forEach(({ type, label, default: defaultValue }) => {
+              if (type === 'color') {
+                values[mode.label][label] = new Color();
               }
-              else if (datum.type === 'int16') {
-                values[mode.label][datum.id] = datum.default;
+              else if (type === 'int16') {
+                values[mode.label][label] = defaultValue;
               }
             });
           });
@@ -94,23 +94,21 @@ class App extends Component {
 
         {mode && (
           <main>
-            {mode.data.map(({ id, label, type, min, max }) => (
+            {mode.data.map(({ label, type, min, max }) => (
               <>
                 {type === 'color' && (
                   <ColorSelect
-                    id={id}
                     label={label}
-                    color={values[mode.label][id]}
+                    color={values[mode.label][label]}
                     updateValue={this.updateValue}
                   />
                 )}
                 {type === 'int16' && (
                   <NumberRange
-                    id={id}
                     label={label}
                     min={min}
                     max={max}
-                    value={values[mode.label][id]}
+                    value={values[mode.label][label]}
                     updateValue={this.updateValue}
                   />
                 )}

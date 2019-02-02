@@ -2,7 +2,7 @@ import React from 'react';
 import { Grid, Row, Col } from 'react-flexbox-grid';
 
 
-export default function NumberRange({ id, label, min, max, value, updateValue }) {
+export default function NumberRange({ label, min, max, value, updateValue }) {
   return (
     <Grid fluid className='NumberRange'>
       <Row>
@@ -14,7 +14,7 @@ export default function NumberRange({ id, label, min, max, value, updateValue })
             min={min}
             max={max}
             value={value}
-            onChange={e => updateValue(id, e.target.value)}
+            onChange={e => updateValue(label, e.target.value)}
           />
         </Col>
       </Row>

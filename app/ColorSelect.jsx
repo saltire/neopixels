@@ -12,12 +12,12 @@ const channels = [
 
 export default class ColorSelect extends Component {
   updateColor(channel, value) {
-    const { id, color, updateValue } = this.props;
+    const { label, color, updateValue } = this.props;
 
     const newColor = new Color(color.r, color.g, color.b);
     newColor[channel] = Number(value) || 0;
 
-    updateValue(id, newColor);
+    updateValue(label, newColor);
   }
 
   render() {
