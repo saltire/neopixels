@@ -3,7 +3,6 @@ import { render } from 'react-dom';
 
 import './index.scss';
 import App from './App';
-import { pixelCount } from '../config.json';
 
 
-render(<App pixelCount={pixelCount} />, document.querySelector('#root'));
+render(<App />, document.querySelector('#root'));

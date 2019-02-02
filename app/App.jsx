@@ -13,63 +13,61 @@ class App extends Component {
     super(props);
 
     this.state = {
+      modes: null,
       currentMode: 'Fade',
-      modeData: {
-        Fade: {
-          color1: new Color(),
-          duration: 1000,
-        },
-        Wipe: {
-          color1: new Color(),
-          duration: 1000,
-          reverse: false,
-        },
-        Marquee: {
-          color1: new Color(),
-          color2: new Color(),
-          length1: 5,
-          length2: 2,
-          duration: 1000,
-          reverse: false,
-        },
-        Rainbow: {
-          duration: 5000,
-          length: 500,
-          reverse: false,
-        },
-        Pulse: {
-          color1: new Color(),
-          color2: new Color(),
-          duration: 1000,
-        },
-      },
+      values: {},
     };
 
     this.updateValue = this.updateValue.bind(this);
     this.send = this.send.bind(this);
   }
 
+  componentDidMount() {
+    axios.get('/modes')
+      .then((resp) => {
+        if (resp.data.modes && resp.data.modes.length) {
+          const values = {};
+          resp.data.modes.forEach((mode) => {
+            values[mode.label] = {};
+            mode.data.forEach((datum) => {
+              if (datum.type === 'color') {
+                values[mode.label][datum.id] = new Color();
+              }
+              else if (datum.type === 'int16') {
+                values[mode.label][datum.id] = datum.default;
+              }
+            });
+          });
+
+          this.setState({
+            modes: resp.data.modes,
+            currentMode: resp.data.modes[0].label,
+            values,
+          });
+        }
+      })
+      .catch(console.error);
+  }
+
   updateValue(prop, value) {
-    this.setState(({ currentMode, modeData }) => ({
-      modeData: Object.assign({}, modeData, {
-        [currentMode]: Object.assign({}, modeData[currentMode], { [prop]: value }),
+    this.setState(({ currentMode, values }) => ({
+      values: Object.assign({}, values, {
+        [currentMode]: Object.assign({}, values[currentMode], { [prop]: value }),
       }),
     }));
   }
 
   send() {
-    const { currentMode, modeData } = this.state;
+    const { currentMode, values } = this.state;
 
-    axios.post('/color', { mode: currentMode, data: modeData[currentMode] })
+    axios.post('/color', { mode: currentMode, data: values[currentMode] })
       .catch(console.error);
   }
 
   render() {
-    const { pixelCount } = this.props;
-    const { currentMode, modeData } = this.state;
+    const { modes, currentMode, values } = this.state;
 
-    const count = Number(pixelCount) || 150;
-    const data = modeData[currentMode];
+    const mode = modes && modes.find(m => m.label === currentMode);
 
     return (
       <div className='App'>
@@ -77,145 +75,49 @@ class App extends Component {
           <h1>NeoPixel Controller</h1>
         </header>
 
-        <nav>
-          {Object.keys(modeData).map(mode => (
-            <button
-              key={mode}
-              type='button'
-              className={currentMode === mode ? 'active' : undefined}
-              onClick={() => this.setState({ currentMode: mode })}
-            >
-              {mode}
-            </button>
-          ))}
-        </nav>
+        {!modes && 'Loading...'}
 
-        <main>
-          {currentMode === 'Fade' && (
-            <>
-              <ColorSelect
-                id='color1'
-                label='Color'
-                color={data.color1}
-                updateValue={this.updateValue}
-              />
-              <NumberRange
-                id='duration'
-                label='Duration (msec)'
-                min={100}
-                max={10000}
-                value={data.duration}
-                updateValue={this.updateValue}
-              />
-            </>
-          )}
+        {modes && (
+          <nav>
+            {modes.map(({ label }) => (
+              <button
+                key={label}
+                type='button'
+                className={currentMode === label ? 'active' : undefined}
+                onClick={() => this.setState({ currentMode: label })}
+              >
+                {label}
+              </button>
+            ))}
+          </nav>
+        )}
 
-          {currentMode === 'Wipe' && (
-            <>
-              <ColorSelect
-                id='color1'
-                label='Color'
-                color={data.color1}
-                updateValue={this.updateValue}
-              />
-              <NumberRange
-                id='duration'
-                label='Duration (msec)'
-                min={100}
-                max={10000}
-                value={data.duration}
-                updateValue={this.updateValue}
-              />
-            </>
-          )}
-
-          {currentMode === 'Marquee' && (
-            <>
-              <ColorSelect
-                id='color1'
-                label='Color #1'
-                color={data.color1}
-                updateValue={this.updateValue}
-              />
-              <NumberRange
-                id='length1'
-                label='Color #1 Length'
-                min={1}
-                max={count}
-                value={data.length1}
-                updateValue={this.updateValue}
-              />
-              <ColorSelect
-                id='color2'
-                label='Color #2'
-                color={data.color2}
-                updateValue={this.updateValue}
-              />
-              <NumberRange
-                id='length2'
-                label='Color #2 Length'
-                min={1}
-                max={count}
-                value={data.length2}
-                updateValue={this.updateValue}
-              />
-              <NumberRange
-                id='duration'
-                label='Duration (msec)'
-                min={100}
-                max={10000}
-                value={data.duration}
-                updateValue={this.updateValue}
-              />
-            </>
-          )}
-
-          {currentMode === 'Rainbow' && (
-            <>
-              <NumberRange
-                id='duration'
-                label='Duration (msec)'
-                min={100}
-                max={60000}
-                value={data.duration}
-                updateValue={this.updateValue}
-              />
-              <NumberRange
-                id='length'
-                label='Length (pixels)'
-                min={1}
-                max={600}
-                value={data.length}
-                updateValue={this.updateValue}
-              />
-            </>
-          )}
-
-          {currentMode === 'Pulse' && (
-            <>
-              <ColorSelect
-                id='color1'
-                label='Color #1'
-                color={data.color1}
-                updateValue={this.updateValue}
-              />
-              <ColorSelect
-                id='color2'
-                label='Color #2'
-                color={data.color2}
-                updateValue={this.updateValue}
-              />
-              <NumberRange
-                id='duration'
-                label='Duration (msec)'
-                min={100}
-                max={10000}
-                value={data.duration}
-                updateValue={this.updateValue}
-              />
-            </>
-          )}
-        </main>
+        {mode && (
+          <main>
+            {mode.data.map(({ id, label, type, min, max }) => (
+              <>
+                {type === 'color' && (
+                  <ColorSelect
+                    id={id}
+                    label={label}
+                    color={values[mode.label][id]}
+                    updateValue={this.updateValue}
+                  />
+                )}
+                {type === 'int16' && (
+                  <NumberRange
+                    id={id}
+                    label={label}
+                    min={min}
+                    max={max}
+                    value={values[mode.label][id]}
+                    updateValue={this.updateValue}
+                  />
+                )}
+              </>
+            ))}
+          </main>
+        )}
 
         <nav>
           <button type='button' onClick={this.send}>Send</button>
