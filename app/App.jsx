@@ -8,8 +8,6 @@ import ColorSelect from './ColorSelect';
 import NumberRange from './NumberRange';
 
 
-const modes = ['Fade', 'Wipe', 'Marquee', 'Rainbow', 'Pulse'];
-
 class App extends Component {
   constructor(props) {
     super(props);
@@ -19,12 +17,12 @@ class App extends Component {
       modeData: {
         Fade: {
           color1: new Color(),
-          duration: 1000
+          duration: 1000,
         },
         Wipe: {
           color1: new Color(),
           duration: 1000,
-          reverse: false
+          reverse: false,
         },
         Marquee: {
           color1: new Color(),
@@ -32,19 +30,19 @@ class App extends Component {
           length1: 5,
           length2: 2,
           duration: 1000,
-          reverse: false
+          reverse: false,
         },
         Rainbow: {
           duration: 5000,
           length: 500,
-          reverse: false
+          reverse: false,
         },
         Pulse: {
           color1: new Color(),
           color2: new Color(),
-          duration: 1000
-        }
-      }
+          duration: 1000,
+        },
+      },
     };
 
     this.updateValue = this.updateValue.bind(this);
@@ -84,7 +82,7 @@ class App extends Component {
             <button
               key={mode}
               type='button'
-              className={currentMode == mode ? 'active' : undefined}
+              className={currentMode === mode ? 'active' : undefined}
               onClick={() => this.setState({ currentMode: mode })}
             >
               {mode}
@@ -93,7 +91,7 @@ class App extends Component {
         </nav>
 
         <main>
-        {currentMode === 'Fade' && (
+          {currentMode === 'Fade' && (
             <>
               <ColorSelect
                 id='color1'
