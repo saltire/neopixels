@@ -18,14 +18,12 @@ app.use(morgan('dev'));
 const serial = new Serial(config);
 
 
+app.get('/modes', (req, res) => res.json({ modes: modes.getModes(config.pixelCount) }));
+
 app.post('/color', (req, res, next) => {
   const { mode, data } = req.body;
+  const bytes = modes.getBytes(mode, data);
 
-  if (!modes[mode]) {
-    return next(new Error('Invalid mode.'));
-  }
-
-  const bytes = modes[mode](data);
   return serial.send(bytes)
     .then(() => res.sendStatus(200))
     .catch(next);

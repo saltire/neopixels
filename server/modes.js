@@ -1,57 +1,62 @@
 'use strict';
 
 module.exports = {
-  Fade: data => [
-    0,
-    data.color1.r,
-    data.color1.g,
-    data.color1.b,
-    data.duration >> 8,
-    data.duration & 0xff,
+  getModes: pixelCount => [
+    {
+      label: 'Fade',
+      data: [
+        { id: 'color1', label: 'Color', type: 'color' },
+        { id: 'duration', label: 'Duration (msec)', type: 'int16', min: 100, max: 10000, default: 1000 },
+      ],
+    },
+    {
+      label: 'Wipe',
+      data: [
+        { id: 'color1', label: 'Color', type: 'color' },
+        { id: 'duration', label: 'Duration (msec)', type: 'int16', min: 100, max: 10000, default: 1000 },
+      ],
+    },
+    {
+      label: 'Marquee',
+      data: [
+        { id: 'color1', label: 'Color #1', type: 'color' },
+        { id: 'color2', label: 'Color #2', type: 'color' },
+        { id: 'length1', label: 'Color #1 Length', type: 'int16', min: 1, max: pixelCount, default: 5 },
+        { id: 'length2', label: 'Color #2 Length', type: 'int16', min: 1, max: pixelCount, default: 2 },
+        { id: 'duration', label: 'Duration (msec)', type: 'int16', min: 100, max: 10000, default: 1000 },
+      ],
+    },
+    {
+      label: 'Rainbow',
+      data: [
+        { id: 'duration', label: 'Duration (msec)', type: 'int16', min: 100, max: 60000, default: 5000 },
+        { id: 'length', label: 'Length', type: 'int16', min: 1, max: 10000, default: 500 },
+      ],
+    },
+    {
+      label: 'Pulse',
+      data: [
+        { id: 'color1', label: 'Color #1', type: 'color' },
+        { id: 'color2', label: 'Color #2', type: 'color' },
+        { id: 'duration', label: 'Duration (msec)', type: 'int16', min: 100, max: 10000, default: 1000 },
+      ],
+    },
   ],
 
-  Wipe: data => [
-    1,
-    data.color1.r,
-    data.color1.g,
-    data.color1.b,
-    data.duration >> 8,
-    data.duration & 0xff,
-  ],
+  getBytes(modeLabel, data) {
+    const modes = module.exports.getModes();
+    const mode = modes.find(m => m.label === modeLabel);
 
-  Marquee: data => [
-    2,
-    data.color1.r,
-    data.color1.g,
-    data.color1.b,
-    data.color2.r,
-    data.color2.g,
-    data.color2.b,
-    data.length1 >> 8,
-    data.length1 & 0xff,
-    data.length2 >> 8,
-    data.length2 & 0xff,
-    data.duration >> 8,
-    data.duration & 0xff,
-  ],
-
-  Rainbow: data => [
-    3,
-    data.duration >> 8,
-    data.duration & 0xff,
-    data.length >> 8,
-    data.length & 0xff,
-  ],
-
-  Pulse: data => [
-    4,
-    data.color1.r,
-    data.color1.g,
-    data.color1.b,
-    data.color2.r,
-    data.color2.g,
-    data.color2.b,
-    data.duration >> 8,
-    data.duration & 0xff,
-  ],
+    return !mode ? [] :
+      [modes.indexOf(mode)].concat(...((mode && mode.data) || [])
+        .map(({ id, type }) => {
+          if (type === 'color') {
+            return [data[id].r, data[id].g, data[id].b];
+          }
+          if (type === 'int16') {
+            return [data[id] >> 8, data[id] & 0xff];
+          }
+          return [];
+        }));
+  },
 };
