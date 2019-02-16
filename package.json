@@ -8,6 +8,7 @@
   },
   "main": "server/index.js",
   "scripts": {
+    "cmd": "node server/cli.js",
     "start": "node server/index.js",
     "watch": "nodemon -r dotenv/config server/index.js",
     "debug": "nodemon -r dotenv/config --inspect server/index.js",

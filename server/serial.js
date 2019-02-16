@@ -3,9 +3,13 @@
 const SerialPort = require('serialport');
 const util = require('util');
 
+const modes = require('./modes');
 
-module.exports = class Serial {
-  constructor(config) {
+const config = require('../config.json');
+
+
+class Serial {
+  constructor() {
     this.serial = new SerialPort(config.port, {
       baudRate: 9600,
       dtr: false,
@@ -22,4 +26,11 @@ module.exports = class Serial {
     return this.write(bytes)
       .then(() => console.log(`Wrote ${bytes.length} bytes:`, bytes.join(' ')));
   }
-};
+
+  run(mode, data) {
+    const bytes = modes.getBytes(mode, data);
+    return this.send(bytes);
+  }
+}
+
+module.exports = new Serial();

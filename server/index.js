@@ -6,7 +6,7 @@ const morgan = require('morgan');
 
 const client = require('./client');
 const modes = require('./modes');
-const Serial = require('./serial');
+const serial = require('./serial');
 
 const config = require('../config.json');
 
@@ -15,16 +15,13 @@ const app = express();
 app.use(bodyParser.json());
 app.use(morgan('dev'));
 
-const serial = new Serial(config);
-
 
 app.get('/modes', (req, res) => res.json({ modes: modes.getModes(config.pixelCount) }));
 
 app.post('/color', (req, res, next) => {
   const { mode, data } = req.body;
-  const bytes = modes.getBytes(mode, data);
 
-  return serial.send(bytes)
+  return serial.run(mode, data)
     .then(() => res.sendStatus(200))
     .catch(next);
 });
@@ -37,5 +34,5 @@ app.use((err, req, res, next) => {
   res.status(err.status || 500).send(err.message);
 });
 
-const port = process.env.PORT || 3001;
+const port = process.env.PORT || 5000;
 app.listen(port, () => console.log(`Listening on port ${port}.`));
