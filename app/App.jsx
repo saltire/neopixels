@@ -8,6 +8,19 @@ import ColorSelect from './ColorSelect';
 import NumberRange from './NumberRange';
 
 
+function getDefaultValue({ type, children, default: defaultValue }) {
+  if (type === 'color') {
+    return new Color();
+  }
+  if (type === 'group') {
+    return {
+      count: defaultValue,
+      children: [...Array(defaultValue).keys()].map(() => (children.map(getDefaultValue))),
+    };
+  }
+  return defaultValue;
+}
+
 class App extends Component {
   constructor(props) {
     super(props);
@@ -29,13 +42,8 @@ class App extends Component {
           const values = {};
           resp.data.modes.forEach((mode) => {
             values[mode.label] = {};
-            mode.data.forEach(({ type, label, default: defaultValue }) => {
-              if (type === 'color') {
-                values[mode.label][label] = new Color();
-              }
-              else if (type === 'int16') {
-                values[mode.label][label] = defaultValue;
-              }
+            mode.data.forEach((datum) => {
+              values[mode.label][datum.label] = getDefaultValue(datum);
             });
           });
 
@@ -100,7 +108,7 @@ class App extends Component {
                   <ColorSelect
                     label={label}
                     color={values[mode.label][label]}
-                    updateValue={this.updateValue}
+                    updateValue={newColor => this.updateValue(label, newColor)}
                   />
                 )}
                 {type === 'int16' && (
@@ -109,7 +117,16 @@ class App extends Component {
                     min={min}
                     max={max}
                     value={values[mode.label][label]}
-                    updateValue={this.updateValue}
+                    updateValue={newValue => this.updateValue(label, newValue)}
+                  />
+                )}
+                {type === 'group' && (
+                  <NumberRange
+                    label={label}
+                    min={min}
+                    max={max}
+                    value={values[mode.label][label].count}
+                    updateValue={newValue => this.updateValue(label, { count: newValue })}
                   />
                 )}
               </Fragment>

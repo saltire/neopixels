@@ -19,10 +19,17 @@ module.exports = {
     {
       label: 'Marquee',
       data: [
-        { label: 'Color #1', type: 'color' },
-        { label: 'Color #2', type: 'color' },
-        { label: 'Color #1 Length', type: 'int16', min: 1, max: pixelCount, default: 5 },
-        { label: 'Color #2 Length', type: 'int16', min: 1, max: pixelCount, default: 2 },
+        {
+          label: 'Colors',
+          type: 'group',
+          min: 1,
+          max: 100,
+          default: 2,
+          children: [
+            { label: 'Color', type: 'color', repeat: 'Color count' },
+            { label: 'Color Length', type: 'int16', min: 1, max: pixelCount, default: 5, repeat: 'Color count' },
+          ],
+        },
         { label: 'Duration (msec)', type: 'int16', min: 100, max: 10000, default: 1000 },
       ],
     },
@@ -50,11 +57,16 @@ module.exports = {
     return !mode ? [] :
       [modes.indexOf(mode)].concat(...((mode && mode.data) || [])
         .map(({ label, type }) => {
+          const value = data[label];
+
           if (type === 'color') {
-            return [data[label].r, data[label].g, data[label].b];
+            return [value.r, value.g, value.b];
           }
           if (type === 'int16') {
-            return [data[label] >> 8, data[label] & 0xff];
+            return [value >> 8, value & 0xff];
+          }
+          if (type === 'group') {
+            return [value.count & 0xff].concat();
           }
           return [];
         }));
