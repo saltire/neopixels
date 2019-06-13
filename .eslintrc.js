@@ -10,7 +10,6 @@ module.exports = {
     'no-console': 0,
     'no-multi-assign': 0,
     'no-nested-ternary': 0,
-    'no-underscore-dangle': [2, { allow: ['_id'] }],
     'object-curly-newline': [2, { multiline: true, consistent: true }],
     'operator-linebreak': [2, 'after'],
     'radix': [2, 'as-needed'],

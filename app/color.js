@@ -8,6 +8,6 @@ export default class Color {
   hex() {
     const num = this.r * 0x10000 + this.g * 0x100 + this.b;
     const str = num.toString(16);
-    return '#' + '000000'.slice(str.length) + str;
+    return `#${'000000'.slice(str.length)}${str}`;
   }
 }

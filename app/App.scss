@@ -47,6 +47,10 @@
   > main {
     line-height: 1.5rem;
 
+    h2 {
+      margin-top: 0;
+    }
+
     input[type=range] {
       width: 100%;
       vertical-align: middle;
