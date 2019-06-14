@@ -27,7 +27,7 @@ class App extends Component {
         if (resp.data.modes && resp.data.modes.length) {
           const values = {};
           resp.data.modes.forEach((mode) => {
-            values[mode.label] = getDefaultValues(mode.data);
+            values[mode.label] = getDefaultValues(mode.attrs);
           });
 
           this.setState({
@@ -85,7 +85,7 @@ class App extends Component {
 
         {mode && (
           <main>
-            {mode.data.map(attr => (
+            {mode.attrs.map(attr => (
               <Attribute
                 key={attr.label}
                 attr={attr}

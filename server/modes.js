@@ -4,21 +4,21 @@ module.exports = {
   getModes: pixelCount => [
     {
       label: 'Fade',
-      data: [
+      attrs: [
         { label: 'Color', type: 'color' },
         { label: 'Duration (msec)', type: 'int16', min: 100, max: 10000, default: 1000 },
       ],
     },
     {
       label: 'Wipe',
-      data: [
+      attrs: [
         { label: 'Color', type: 'color' },
         { label: 'Duration (msec)', type: 'int16', min: 100, max: 10000, default: 1000 },
       ],
     },
     {
       label: 'Marquee',
-      data: [
+      attrs: [
         {
           label: 'Colors',
           type: 'array',
@@ -35,14 +35,14 @@ module.exports = {
     },
     {
       label: 'Rainbow',
-      data: [
+      attrs: [
         { label: 'Duration (msec)', type: 'int16', min: 100, max: 60000, default: 5000 },
         { label: 'Length', type: 'int16', min: 1, max: 10000, default: 500 },
       ],
     },
     {
       label: 'Pulse',
-      data: [
+      attrs: [
         { label: 'Color #1', type: 'color' },
         { label: 'Color #2', type: 'color' },
         { label: 'Duration (msec)', type: 'int16', min: 100, max: 10000, default: 1000 },
@@ -55,7 +55,7 @@ module.exports = {
     const mode = modes.find(m => m.label === modeLabel);
 
     return !mode ? [] :
-      [modes.indexOf(mode)].concat(...((mode && mode.data) || [])
+      [modes.indexOf(mode)].concat(...((mode && mode.attrs) || [])
         .map(attr => this.getAttrBytes(attr, data[attr.label])));
   },
 
