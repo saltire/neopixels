@@ -1,25 +1,11 @@
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import { hot } from 'react-hot-loader/root';
 import axios from 'axios';
 
 import './App.scss';
-import Color from './color';
-import ColorSelect from './ColorSelect';
-import NumberRange from './NumberRange';
+import Attribute from './Attribute';
+import { getDefaultValues } from './utils';
 
-
-function getDefaultValue({ type, children, default: defaultValue }) {
-  if (type === 'color') {
-    return new Color();
-  }
-  if (type === 'group') {
-    return {
-      count: defaultValue,
-      children: [...Array(defaultValue).keys()].map(() => (children.map(getDefaultValue))),
-    };
-  }
-  return defaultValue;
-}
 
 class App extends Component {
   constructor(props) {
@@ -41,10 +27,7 @@ class App extends Component {
         if (resp.data.modes && resp.data.modes.length) {
           const values = {};
           resp.data.modes.forEach((mode) => {
-            values[mode.label] = {};
-            mode.data.forEach((datum) => {
-              values[mode.label][datum.label] = getDefaultValue(datum);
-            });
+            values[mode.label] = getDefaultValues(mode.data);
           });
 
           this.setState({
@@ -102,34 +85,13 @@ class App extends Component {
 
         {mode && (
           <main>
-            {mode.data.map(({ label, type, min, max }) => (
-              <Fragment key={label}>
-                {type === 'color' && (
-                  <ColorSelect
-                    label={label}
-                    color={values[mode.label][label]}
-                    updateValue={newColor => this.updateValue(label, newColor)}
-                  />
-                )}
-                {type === 'int16' && (
-                  <NumberRange
-                    label={label}
-                    min={min}
-                    max={max}
-                    value={values[mode.label][label]}
-                    updateValue={newValue => this.updateValue(label, newValue)}
-                  />
-                )}
-                {type === 'group' && (
-                  <NumberRange
-                    label={label}
-                    min={min}
-                    max={max}
-                    value={values[mode.label][label].count}
-                    updateValue={newValue => this.updateValue(label, { count: newValue })}
-                  />
-                )}
-              </Fragment>
+            {mode.data.map(attr => (
+              <Attribute
+                key={attr.label}
+                attr={attr}
+                value={values[mode.label][attr.label]}
+                updateValue={newValue => this.updateValue(attr.label, newValue)}
+              />
             ))}
           </main>
         )}
