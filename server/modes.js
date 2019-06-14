@@ -60,7 +60,7 @@ module.exports = {
   },
 
   getAttrBytes(attr, value) {
-    const { type } = attr;
+    const { type, children } = attr;
 
     if (type === 'color') {
       return [value.r, value.g, value.b];
@@ -69,7 +69,9 @@ module.exports = {
       return [value >> 8, value & 0xff];
     }
     if (type === 'array') {
-      return [value.length & 0xff].concat();
+      return [value.length & 0xff].concat(
+        ...value.map(cv => [].concat(
+          ...children.map(cAttr => this.getAttrBytes(cAttr, cv[cAttr.label])))));
     }
     return [];
   },
