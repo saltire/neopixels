@@ -4,38 +4,45 @@ module.exports = {
   getModes: pixelCount => [
     {
       label: 'Fade',
-      data: [
+      attrs: [
         { label: 'Color', type: 'color' },
         { label: 'Duration (msec)', type: 'int16', min: 100, max: 10000, default: 1000 },
       ],
     },
     {
       label: 'Wipe',
-      data: [
+      attrs: [
         { label: 'Color', type: 'color' },
         { label: 'Duration (msec)', type: 'int16', min: 100, max: 10000, default: 1000 },
       ],
     },
     {
       label: 'Marquee',
-      data: [
-        { label: 'Color #1', type: 'color' },
-        { label: 'Color #2', type: 'color' },
-        { label: 'Color #1 Length', type: 'int16', min: 1, max: pixelCount, default: 5 },
-        { label: 'Color #2 Length', type: 'int16', min: 1, max: pixelCount, default: 2 },
+      attrs: [
+        {
+          label: 'Colors',
+          type: 'array',
+          min: 1,
+          max: 100,
+          default: 2,
+          children: [
+            { label: 'Color', type: 'color' },
+            { label: 'Color Length', type: 'int16', min: 1, max: pixelCount, default: 5 },
+          ],
+        },
         { label: 'Duration (msec)', type: 'int16', min: 100, max: 10000, default: 1000 },
       ],
     },
     {
       label: 'Rainbow',
-      data: [
+      attrs: [
         { label: 'Duration (msec)', type: 'int16', min: 100, max: 60000, default: 5000 },
         { label: 'Length', type: 'int16', min: 1, max: 10000, default: 500 },
       ],
     },
     {
       label: 'Pulse',
-      data: [
+      attrs: [
         { label: 'Color #1', type: 'color' },
         { label: 'Color #2', type: 'color' },
         { label: 'Duration (msec)', type: 'int16', min: 100, max: 10000, default: 1000 },
@@ -48,15 +55,24 @@ module.exports = {
     const mode = modes.find(m => m.label === modeLabel);
 
     return !mode ? [] :
-      [modes.indexOf(mode)].concat(...((mode && mode.data) || [])
-        .map(({ label, type }) => {
-          if (type === 'color') {
-            return [data[label].r, data[label].g, data[label].b];
-          }
-          if (type === 'int16') {
-            return [data[label] >> 8, data[label] & 0xff];
-          }
-          return [];
-        }));
+      [modes.indexOf(mode)].concat(...((mode && mode.attrs) || [])
+        .map(attr => this.getAttrBytes(attr, data[attr.label])));
+  },
+
+  getAttrBytes(attr, value) {
+    const { type, children } = attr;
+
+    if (type === 'color') {
+      return [value.r, value.g, value.b];
+    }
+    if (type === 'int16') {
+      return [value >> 8, value & 0xff];
+    }
+    if (type === 'array') {
+      return [value.length & 0xff].concat(
+        ...value.map(cv => [].concat(
+          ...children.map(cAttr => this.getAttrBytes(cAttr, cv[cAttr.label])))));
+    }
+    return [];
   },
 };

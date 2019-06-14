@@ -48,13 +48,15 @@ void loop() {
             colorWipe(wipeColor, wipeDuration, true);
         }
         else if (mode == MODE_MARQUEE) {
-            uint32_t marqueeColor1 = readColor();
-            uint32_t marqueeColor2 = readColor();
-            uint16_t marqueeLength1 = readInt16();
-            uint16_t marqueeLength2 = readInt16();
+            uint8_t marqueeCount = readInt8();
+            uint32_t marqueeColors[100];
+            uint16_t marqueeLengths[100];
+            for (uint8_t i = 0; i < marqueeCount; i++) {
+                marqueeColors[i] = readColor();
+                marqueeLengths[i] = readInt16();
+            }
             uint16_t marqueeDuration = readInt16();
-            colorMarquee(marqueeColor1, marqueeColor2, marqueeLength1, marqueeLength2,
-                marqueeDuration, true);
+            colorMarquee(marqueeCount, marqueeColors, marqueeLengths, marqueeDuration, true);
         }
         else if (mode == MODE_RAINBOW) {
             uint16_t rainbowDuration = readInt16();
@@ -142,21 +144,27 @@ void colorWipe(uint32_t color, uint16_t duration, bool reverse) {
     }
 }
 
-// Create a scrolling marquee of groups of alternating on and off pixels of a single color.
-void colorMarquee(uint32_t color1, uint32_t color2, uint16_t lightLength, uint16_t darkLength, uint16_t duration, bool reverse) {
-    if (lightLength == 0) return;
-    uint16_t length = lightLength + darkLength;
+// Create a scrolling marquee of groups of pixels of varying colors and lengths.
+void colorMarquee(uint8_t count, uint32_t *colors, uint16_t *lengths, uint16_t duration, bool reverse) {
+    uint16_t length = 0;
+    for (uint8_t i = 0; i < count; i++) {
+        length += lengths[i];
+    }
+    if (length == 0) return;
     uint16_t stepDuration = duration / length;
 
     while (1) {
         for (uint16_t s = 0; s < length; s++) {
             uint16_t offset = reverse ? s : (length - s - 1);
             for (uint16_t p = 0; p < NUM_PIXELS; p++) {
-                if ((p + offset) % length < lightLength) {
-                    strip.setPixelColor(p, color1);
-                }
-                else {
-                    strip.setPixelColor(p, color2);
+                uint16_t pp = (p + offset) % length;
+                uint16_t cend = 0;
+                for (uint8_t c = 0; c < count; c++) {
+                    cend += lengths[c];
+                    if (pp < cend) {
+                        strip.setPixelColor(p, colors[c]);
+                        break;
+                    }
                 }
             }
             strip.show();
@@ -212,4 +220,3 @@ uint32_t wheel(uint8_t wheelPos) {
         return strip.Color(wheelPos * 3, 255 - wheelPos * 3, 0);
     }
 }
-

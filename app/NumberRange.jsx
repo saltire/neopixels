@@ -14,7 +14,7 @@ export default function NumberRange({ label, min, max, value, updateValue }) {
             min={min}
             max={max}
             value={value}
-            onChange={e => updateValue(label, e.target.value)}
+            onChange={e => updateValue(e.target.value)}
           />
         </Col>
       </Row>

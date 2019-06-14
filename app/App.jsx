@@ -1,11 +1,10 @@
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import { hot } from 'react-hot-loader/root';
 import axios from 'axios';
 
 import './App.scss';
-import Color from './color';
-import ColorSelect from './ColorSelect';
-import NumberRange from './NumberRange';
+import Attribute from './Attribute';
+import { getDefaultValues } from './utils';
 
 
 class App extends Component {
@@ -28,15 +27,7 @@ class App extends Component {
         if (resp.data.modes && resp.data.modes.length) {
           const values = {};
           resp.data.modes.forEach((mode) => {
-            values[mode.label] = {};
-            mode.data.forEach(({ type, label, default: defaultValue }) => {
-              if (type === 'color') {
-                values[mode.label][label] = new Color();
-              }
-              else if (type === 'int16') {
-                values[mode.label][label] = defaultValue;
-              }
-            });
+            values[mode.label] = getDefaultValues(mode.attrs);
           });
 
           this.setState({
@@ -94,25 +85,13 @@ class App extends Component {
 
         {mode && (
           <main>
-            {mode.data.map(({ label, type, min, max }) => (
-              <Fragment key={label}>
-                {type === 'color' && (
-                  <ColorSelect
-                    label={label}
-                    color={values[mode.label][label]}
-                    updateValue={this.updateValue}
-                  />
-                )}
-                {type === 'int16' && (
-                  <NumberRange
-                    label={label}
-                    min={min}
-                    max={max}
-                    value={values[mode.label][label]}
-                    updateValue={this.updateValue}
-                  />
-                )}
-              </Fragment>
+            {mode.attrs.map(attr => (
+              <Attribute
+                key={attr.label}
+                attr={attr}
+                value={values[mode.label][attr.label]}
+                updateValue={newValue => this.updateValue(attr.label, newValue)}
+              />
             ))}
           </main>
         )}
