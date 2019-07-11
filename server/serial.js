@@ -12,6 +12,8 @@ class Serial {
   constructor() {
     this.serial = new SerialPort(config.port, {
       baudRate: 9600,
+      // Try to prevent reset on connect on various platforms.
+      hupcl: false,
       dtr: false,
     });
 

@@ -9,11 +9,13 @@
   "main": "server/index.js",
   "scripts": {
     "cmd": "node server/cli.js",
+    "off": "node server/cli.js off",
+    "hex": "node server/cli.js hex",
+    "rainbow": "node server/cli.js rainbow",
     "start": "node server/index.js",
     "watch": "nodemon -r dotenv/config server/index.js",
     "debug": "nodemon -r dotenv/config --inspect server/index.js",
     "build": "webpack -p --config webpack.prod.js",
-    "postinstall": "if test \"$NODE_ENV\" = \"production\"; then npm run build; fi",
     "lint": "eslint --ext .js,.jsx ."
   },
   "dependencies": {

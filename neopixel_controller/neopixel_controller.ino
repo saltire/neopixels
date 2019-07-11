@@ -207,16 +207,15 @@ void colorPulse(uint32_t color1, uint32_t color2, uint16_t duration, uint16_t st
 
 // Input a hue value 0 to 255 to get a 32-bit color value.
 uint32_t wheel(uint8_t wheelPos) {
-    wheelPos = 255 - wheelPos;
     if (wheelPos < 85) {
-        return strip.Color(255 - wheelPos * 3, 0, wheelPos * 3);
+        return strip.Color(255 - wheelPos * 3, wheelPos * 3, 0);
     }
     else if (wheelPos < 170) {
         wheelPos -= 85;
-        return strip.Color(0, wheelPos * 3, 255 - wheelPos * 3);
+        return strip.Color(0, 255 - wheelPos * 3, wheelPos * 3);
     }
     else {
         wheelPos -= 170;
-        return strip.Color(wheelPos * 3, 255 - wheelPos * 3, 0);
+        return strip.Color(wheelPos * 3, 0, 255 - wheelPos * 3);
     }
 }

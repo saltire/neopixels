@@ -59,7 +59,7 @@ if (process.argv.length > 2) {
 
   const { mode, data } = params;
 
-  serial.run(mode, data)
+  serial.serial.on('open', () => serial.run(mode, data)
     .catch(console.error)
-    .finally(() => process.exit());
+    .finally(() => process.exit()));
 }
