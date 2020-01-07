@@ -1,7 +1,8 @@
 #include <Adafruit_NeoPixel.h>
 #include <avr/power.h>
 
-#define PIN 6
+#define OUTPUT_PIN 6
+#define INPUT_PIN 11
 #define NUM_PIXELS 150
 
 // modes
@@ -12,22 +13,27 @@
 #define MODE_PULSE 4
 
 // Parameter 1 = number of pixels in strip
-// Parameter 2 = Arduino pin number (most are valid)
+// Parameter 2 = Arduino output pin number (most are valid)
 // Parameter 3 = pixel type flags, add together as needed:
 //   NEO_KHZ800  800 KHz bitstream (most NeoPixel products w/WS2812 LEDs)
 //   NEO_KHZ400  400 KHz (classic 'v1' (not v2) FLORA pixels, WS2811 drivers)
 //   NEO_GRB     Pixels are wired for GRB bitstream (most NeoPixel products)
 //   NEO_RGB     Pixels are wired for RGB bitstream (v1 FLORA pixels, not v2)
-Adafruit_NeoPixel strip = Adafruit_NeoPixel(NUM_PIXELS, PIN, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel strip = Adafruit_NeoPixel(NUM_PIXELS, OUTPUT_PIN, NEO_GRB + NEO_KHZ800);
 
 void setup() {
+    // Set input pin to use pullup resistor; it's wired to a button connected to ground.
+    pinMode(INPUT_PIN, INPUT_PULLUP);
+
     strip.begin();
     strip.show(); // Initialize all pixels to off.
 
     Serial.begin(9600);
 
+    // Signal program start by fading red in and out.
     colorFade(strip.Color(255, 0, 0), 500, 20);
     colorFade(strip.Color(0, 0, 0), 500, 20);
+
     // colorWipe(strip.Color(0, 255, 0), 1000, false);
     // colorMarquee(strip.Color(0, 0, 255), 5, 2, 1000, false);
     // rainbowCycle(5000, 500, false);
@@ -69,6 +75,12 @@ void loop() {
             uint16_t pulseDuration = readInt16();
             colorPulse(pulseColor1, pulseColor2, pulseDuration, 20);
         }
+    }
+
+    // Input pin uses pullup resistor, so when button is pressed it will be low.
+    if (digitalRead(INPUT_PIN) == LOW) {
+        // When button is pressed, go straight to rainbow cycle.
+        rainbowCycle(5000, 500, false);
     }
 }
 
@@ -185,7 +197,7 @@ void rainbowCycle(uint16_t duration, uint16_t length, bool reverse) {
             }
             else {
                 for (uint16_t p = 0; p < NUM_PIXELS; p++) {
-                    strip.setPixelColor(p, wheel(((p * 256 / length) + (reverse ? c : -c)) & 255));
+                    strip.setPixelColor(p, wheel(((p * 256 / length) + (reverse ? -c : c)) & 255));
                 }
                 strip.show();
             }
