@@ -5,7 +5,6 @@
 #define INPUT_PIN 11
 #define NUM_PIXELS 150
 
-// modes
 #define MODE_FADE 0
 #define MODE_WIPE 1
 #define MODE_MARQUEE 2
@@ -84,6 +83,10 @@ void loop() {
   }
 }
 
+bool inputReceived() {
+  return Serial.available() || digitalRead(INPUT_PIN) == LOW;
+}
+
 uint8_t readInt8() {
   while (Serial.available() < 1) {}
   return Serial.read();
@@ -136,7 +139,7 @@ void colorFade(uint32_t color, uint16_t duration, uint16_t stepDuration) {
     }
     strip.show();
     delay(stepDuration);
-    if (Serial.available()) return;
+    if (inputReceived()) return;
   }
 }
 
@@ -152,7 +155,7 @@ void colorWipe(uint32_t color, uint16_t duration, bool reverse) {
     strip.setPixelColor(reverse ? NUM_PIXELS - p : p, color);
     strip.show();
     delay(stepDuration);
-    if (Serial.available()) return;
+    if (inputReceived()) return;
   }
 }
 
@@ -165,7 +168,7 @@ void colorMarquee(uint8_t count, uint32_t *colors, uint16_t *lengths, uint16_t d
   if (length == 0) return;
   uint16_t stepDuration = duration / length;
 
-  while (1) {
+  while (true) {
     for (uint16_t s = 0; s < length; s++) {
       uint16_t offset = reverse ? s : (length - s - 1);
       for (uint16_t p = 0; p < NUM_PIXELS; p++) {
@@ -181,7 +184,7 @@ void colorMarquee(uint8_t count, uint32_t *colors, uint16_t *lengths, uint16_t d
       }
       strip.show();
       delay(stepDuration);
-      if (Serial.available()) return;
+      if (inputReceived()) return;
     }
   }
 }
@@ -190,7 +193,7 @@ void colorMarquee(uint8_t count, uint32_t *colors, uint16_t *lengths, uint16_t d
 void rainbowCycle(uint16_t duration, uint16_t length, bool reverse) {
   uint16_t stepDuration = duration / 256;
 
-  while (1) {
+  while (true) {
     for (uint8_t c = 0; c < 256; c++) {
       if (!length) {
         setColor(wheel(c));
@@ -202,18 +205,17 @@ void rainbowCycle(uint16_t duration, uint16_t length, bool reverse) {
         strip.show();
       }
       delay(stepDuration);
-      if (Serial.available()) return;
+      if (inputReceived()) return;
     }
   }
 }
 
 // Fade alternately between two colors.
 void colorPulse(uint32_t color1, uint32_t color2, uint16_t duration, uint16_t stepDuration) {
-  while (1) {
+  while (true) {
     colorFade(color1, duration, stepDuration);
-    if (Serial.available()) return;
     colorFade(color2, duration, stepDuration);
-    if (Serial.available()) return;
+    if (inputReceived()) return;
   }
 }
 
